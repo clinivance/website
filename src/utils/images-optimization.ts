@@ -1,42 +1,38 @@
-import { getImage } from 'astro:assets';
-import { transformUrl, parseUrl } from 'unpic';
-
 import type { ImageMetadata } from 'astro';
 import type { HTMLAttributes } from 'astro/types';
+import { getImage } from 'astro:assets';
+import { parseUrl, transformUrl } from 'unpic';
 
-type Layout = 'fixed' | 'constrained' | 'fullWidth' | 'cover' | 'responsive' | 'contained';
+type Layout = 'constrained' | 'contained' | 'cover' | 'fixed' | 'fullWidth' | 'responsive';
 
-export interface AttributesProps extends HTMLAttributes<'img'> {}
+export type AttributesProps = {} & HTMLAttributes<'img'>;
 
-export interface ImageProps extends Omit<HTMLAttributes<'img'>, 'src'> {
-  src?: string | ImageMetadata | null;
-  width?: string | number | null;
-  height?: string | number | null;
-  alt?: string | null;
-  loading?: 'eager' | 'lazy' | null;
-  decoding?: 'sync' | 'async' | 'auto' | null;
-  style?: string;
-  srcset?: string | null;
-  sizes?: string | null;
-  fetchpriority?: 'high' | 'low' | 'auto' | null;
-
+export type ImageProps = {
+  alt?: null | string;
+  aspectRatio?: null | number | string;
+  decoding?: 'async' | 'auto' | 'sync' | null;
+  fetchpriority?: 'auto' | 'high' | 'low' | null;
+  height?: null | number | string;
   layout?: Layout;
-  widths?: number[] | null;
-  aspectRatio?: string | number | null;
-}
+  loading?: 'eager' | 'lazy' | null;
+  sizes?: null | string;
+  src?: ImageMetadata | null | string;
+  srcset?: null | string;
+
+  style?: string;
+  width?: null | number | string;
+  widths?: null | number[];
+} & Omit<HTMLAttributes<'img'>, 'src'>;
 
 export type ImagesOptimizer = (
   image: ImageMetadata | string,
   breakpoints: number[],
   width?: number,
   height?: number
-) => Promise<Array<{ src: string; width: number }>>;
+) => Promise<{ src: string; width: number }[]>;
 
 /* ******* */
 const config = {
-  // FIXME: Use this when image.width is minor than deviceSizes
-  imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-
   deviceSizes: [
     640, // older and lower-end phones
     750, // iPhone 6-8
@@ -52,21 +48,24 @@ const config = {
     3840, // 4K
     4480, // 4.5K
     5120, // 5K
-    6016, // 6K
+    6016 // 6K
   ],
 
   formats: ['image/webp'],
+
+  // FIXME: Use this when image.width is minor than deviceSizes
+  imageSizes: [16, 32, 48, 64, 96, 128, 256, 384]
 };
 
 const computeHeight = (width: number, aspectRatio: number) => {
   return Math.floor(width / aspectRatio);
 };
 
-const parseAspectRatio = (aspectRatio: number | string | null | undefined): number | undefined => {
+const parseAspectRatio = (aspectRatio: null | number | string | undefined): number | undefined => {
   if (typeof aspectRatio === 'number') return aspectRatio;
 
   if (typeof aspectRatio === 'string') {
-    const match = aspectRatio.match(/(\d+)\s*[/:]\s*(\d+)/);
+    const match = /(\d+)\s*[/:]\s*(\d+)/.exec(aspectRatio);
 
     if (match) {
       const [, num, den] = match.map(Number);
@@ -109,25 +108,25 @@ export const getSizes = (width?: number, layout?: Layout): string | undefined =>
 const pixelate = (value?: number) => (value || value === 0 ? `${value}px` : undefined);
 
 const getStyle = ({
-  width,
-  height,
   aspectRatio,
+  background,
+  height,
   layout,
   objectFit = 'cover',
   objectPosition = 'center',
-  background,
+  width
 }: {
-  width?: number;
-  height?: number;
   aspectRatio?: number;
+  background?: string;
+  height?: number;
+  layout?: string;
   objectFit?: string;
   objectPosition?: string;
-  layout?: string;
-  background?: string;
+  width?: number;
 }) => {
-  const styleEntries: Array<[prop: string, value: string | undefined]> = [
+  const styleEntries: [prop: string, value: string | undefined][] = [
     ['object-fit', objectFit],
-    ['object-position', objectPosition],
+    ['object-position', objectPosition]
   ];
 
   // If background is a URL, set it to cover the image and not repeat
@@ -178,13 +177,13 @@ const getStyle = ({
 };
 
 const getBreakpoints = ({
-  width,
   breakpoints,
   layout,
+  width
 }: {
-  width?: number;
   breakpoints?: number[];
   layout: Layout;
+  width?: number;
 }): number[] => {
   if (layout === 'fullWidth' || layout === 'cover' || layout === 'responsive' || layout === 'contained') {
     return breakpoints || config.deviceSizes;
@@ -202,7 +201,7 @@ const getBreakpoints = ({
       width,
       doubleWidth,
       // Filter out any resolutions that are larger than the double-res image
-      ...(breakpoints || config.deviceSizes).filter((w) => w < doubleWidth),
+      ...(breakpoints || config.deviceSizes).filter((w) => w < doubleWidth)
     ];
   }
 
@@ -217,10 +216,10 @@ export const astroAsseetsOptimizer: ImagesOptimizer = async (image, breakpoints,
 
   return Promise.all(
     breakpoints.map(async (w: number) => {
-      const url = (await getImage({ src: image, width: w, inferSize: true })).src;
+      const url = (await getImage({ inferSize: true, src: image, width: w })).src;
       return {
         src: url,
-        width: w,
+        width: w
       };
     })
   );
@@ -245,14 +244,14 @@ export const unpicOptimizer: ImagesOptimizer = async (image, breakpoints, width,
     breakpoints.map(async (w: number) => {
       const url =
         transformUrl({
-          url: image,
-          width: w,
-          height: width && height ? computeHeight(w, width / height) : height,
           cdn: urlParsed.cdn,
+          height: width && height ? computeHeight(w, width / height) : height,
+          url: image,
+          width: w
         }) || image;
       return {
         src: String(url),
-        width: w,
+        width: w
       };
     })
   );
@@ -261,9 +260,9 @@ export const unpicOptimizer: ImagesOptimizer = async (image, breakpoints, width,
 /* ** */
 export async function getImagesOptimized(
   image: ImageMetadata | string,
-  { src: _, width, height, sizes, aspectRatio, widths, layout = 'constrained', style = '', ...rest }: ImageProps,
+  { aspectRatio, height, layout = 'constrained', sizes, src: _, style = '', width, widths, ...rest }: ImageProps,
   transform: ImagesOptimizer = () => Promise.resolve([])
-): Promise<{ src: string; attributes: AttributesProps }> {
+): Promise<{ attributes: AttributesProps; src: string }> {
   if (typeof image !== 'string') {
     width ||= Number(image.width) || undefined;
     height ||= typeof width === 'number' ? computeHeight(width, image.width / image.height) : undefined;
@@ -299,7 +298,7 @@ export async function getImagesOptimized(
     console.error('Image', image);
   }
 
-  let breakpoints = getBreakpoints({ width: width, breakpoints: widths, layout: layout });
+  let breakpoints = getBreakpoints({ breakpoints: widths, layout: layout, width: width });
   breakpoints = [...new Set(breakpoints)].sort((a, b) => a - b);
 
   const srcset = (await transform(image, breakpoints, Number(width) || undefined, Number(height) || undefined))
@@ -307,19 +306,19 @@ export async function getImagesOptimized(
     .join(', ');
 
   return {
-    src: typeof image === 'string' ? image : image.src,
     attributes: {
-      width: width,
       height: height,
-      srcset: srcset || undefined,
       sizes: sizes,
+      srcset: srcset || undefined,
       style: `${getStyle({
-        width: width,
-        height: height,
         aspectRatio: aspectRatio,
+        height: height,
         layout: layout,
+        width: width
       })}${style ?? ''}`,
-      ...rest,
+      width: width,
+      ...rest
     },
+    src: typeof image === 'string' ? image : image.src
   };
 }

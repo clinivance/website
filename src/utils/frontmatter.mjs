@@ -1,5 +1,5 @@
-import getReadingTime from 'reading-time';
 import { toString } from 'mdast-util-to-string';
+import getReadingTime from 'reading-time';
 import lazyLoadPlugin from 'rehype-plugin-image-native-lazy-loading';
 
 export function readingTimeRemarkPlugin() {
@@ -20,12 +20,12 @@ export function responsiveTablesRehypePlugin() {
 
       if (child.type === 'element' && child.tagName === 'table') {
         const wrapper = {
-          type: 'element',
-          tagName: 'div',
-          properties: {
-            style: 'overflow:auto',
-          },
           children: [child],
+          properties: {
+            style: 'overflow:auto'
+          },
+          tagName: 'div',
+          type: 'element'
         };
 
         tree.children[i] = wrapper;

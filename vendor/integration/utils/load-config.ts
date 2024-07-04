@@ -1,7 +1,8 @@
 import fs from 'node:fs';
+
 import yaml from 'js-yaml';
 
-const loadConfig = async (configPathOrData: string | object) => {
+export const loadConfig = (configPathOrData: object | string) => {
   if (typeof configPathOrData === 'string') {
     const content = fs.readFileSync(configPathOrData, 'utf8');
     if (configPathOrData.endsWith('.yaml') || configPathOrData.endsWith('.yml')) {
@@ -12,5 +13,3 @@ const loadConfig = async (configPathOrData: string | object) => {
 
   return configPathOrData;
 };
-
-export default loadConfig;

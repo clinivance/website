@@ -1,11 +1,12 @@
 {
-  "extends": "astro/tsconfigs/base",
+  "extends": ["@joshunrau/tsconfig"],
   "compilerOptions": {
-    "strictNullChecks": true,
-    "allowJs": true,
-    "baseUrl": ".",
+    "baseUrl": "src",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["*"]
     }
-  }
+  },
+  "include": ["src/**/*", "vendor/**/*", "astro.config.ts", "*.js", "*.cjs"]
 }

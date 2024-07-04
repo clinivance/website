@@ -1,286 +1,272 @@
+import type { ImageMetadata } from 'astro';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
-import type { HTMLAttributes, ImageMetadata } from 'astro/types';
+import type { HTMLAttributes } from 'astro/types';
 
-export interface Post {
-  /** A unique ID number that identifies a post. */
-  id: string;
-
-  /** A post’s unique slug – part of the post’s URL based on its name, i.e. a post called “My Sample Page” has a slug “my-sample-page”. */
-  slug: string;
-
-  /**  */
-  permalink: string;
-
-  /**  */
-  publishDate: Date;
-  /**  */
-  updateDate?: Date;
-
-  /**  */
-  title: string;
+export type Post = {
+  Content?: AstroComponentFactory;
+  author?: string;
+  category?: Taxonomy;
+  content?: string;
+  draft?: boolean;
   /** Optional summary of post content. */
   excerpt?: string;
-  /**  */
+  /** A unique ID number that identifies a post. */
+  id: string;
   image?: ImageMetadata | string;
-
-  /**  */
-  category?: Taxonomy;
-  /**  */
-  tags?: Taxonomy[];
-  /**  */
-  author?: string;
-
-  /**  */
   metadata?: MetaData;
-
-  /**  */
-  draft?: boolean;
-
-  /**  */
-  Content?: AstroComponentFactory;
-  content?: string;
-
-  /**  */
+  permalink?: string;
+  publishDate: Date;
   readingTime?: number;
-}
+  /** A post’s unique slug – part of the post’s URL based on its name, i.e. a post called “My Sample Page” has a slug “my-sample-page”. */
+  slug: string;
+  tags?: Taxonomy[];
+  title: string;
+  updateDate?: Date;
+};
 
-export interface Taxonomy {
+export type Taxonomy = {
   slug: string;
   title: string;
-}
+};
 
-export interface MetaData {
-  title?: string;
-  ignoreTitleTemplate?: boolean;
-
+export type MetaData = {
   canonical?: string;
-
-  robots?: MetaDataRobots;
-
   description?: string;
-
+  ignoreTitleTemplate?: boolean;
   openGraph?: MetaDataOpenGraph;
+  robots?: MetaDataRobots;
+  title?: string;
   twitter?: MetaDataTwitter;
-}
+};
 
-export interface MetaDataRobots {
-  index?: boolean;
+export type MetaDataRobots = {
   follow?: boolean;
-}
+  index?: boolean;
+};
 
-export interface MetaDataImage {
+export type MetaDataImage = {
+  height?: number;
   url: string;
   width?: number;
-  height?: number;
-}
+};
 
-export interface MetaDataOpenGraph {
-  url?: string;
-  siteName?: string;
-  images?: Array<MetaDataImage>;
+export type MetaDataOpenGraph = {
+  images?: MetaDataImage[];
   locale?: string;
+  siteName?: string;
   type?: string;
-}
+  url?: string;
+};
 
-export interface MetaDataTwitter {
+export type MetaDataTwitter = {
+  cardType?: string;
   handle?: string;
   site?: string;
-  cardType?: string;
-}
+};
 
-export interface Image {
-  src: string;
+export type Image = {
   alt?: string;
-}
+  src: string;
+};
 
-export interface Video {
+export type Video = {
   src: string;
   type?: string;
-}
+};
 
-export interface Widget {
+export type Widget = {
+  bg?: string;
+  classes?: { [key: string]: { [key: string]: string } | string };
   id?: string;
   isDark?: boolean;
-  bg?: string;
-  classes?: Record<string, string | Record<string, string>>;
-}
+};
 
-export interface Headline {
-  title?: string;
+export type Headline = {
+  classes?: { [key: string]: string };
   subtitle?: string;
   tagline?: string;
-  classes?: Record<string, string>;
-}
+  title?: string;
+};
 
-interface TeamMember {
-  name?: string;
-  job?: string;
-  image?: Image;
-  socials?: Array<Social>;
+type TeamMember = {
+  classes?: { [key: string]: string };
   description?: string;
-  classes?: Record<string, string>;
-}
+  image?: Image;
+  job?: string;
+  name?: string;
+  socials?: Social[];
+};
 
-interface Social {
-  icon?: string;
+type Social = {
   href?: string;
-}
+  icon?: string;
+};
 
-export interface Stat {
+export type Stat = {
   amount?: number | string;
-  title?: string;
   icon?: string;
-}
-
-export interface Item {
   title?: string;
+};
+
+export type Item = {
+  callToAction?: CallToAction;
+  classes?: { [key: string]: string };
   description?: string;
   icon?: string;
-  classes?: Record<string, string>;
-  callToAction?: CallToAction;
   image?: Image;
-}
-
-export interface Price {
   title?: string;
-  subtitle?: string;
-  description?: string;
-  price?: number | string;
-  period?: string;
-  items?: Array<Item>;
+};
+
+export type Price = {
   callToAction?: CallToAction;
+  description?: string;
   hasRibbon?: boolean;
+  items?: Item[];
+  period?: string;
+  price?: number | string;
   ribbonTitle?: string;
-}
-
-export interface Testimonial {
+  subtitle?: string;
   title?: string;
-  testimonial?: string;
-  name?: string;
+};
+
+export type Testimonial = {
+  image?: unknown;
   job?: string;
-  image?: string | unknown;
-}
+  name?: string;
+  testimonial?: string;
+  title?: string;
+};
 
-export interface Input {
-  type: HTMLInputTypeAttribute;
-  name: string;
-  label?: string;
+export type Input = {
   autocomplete?: string;
+  label?: string;
+  name: string;
   placeholder?: string;
-}
+  type: HTMLInputTypeAttribute;
+};
 
-export interface Textarea {
+export type Textarea = {
   label?: string;
   name?: string;
   placeholder?: string;
   rows?: number;
-}
+};
 
-export interface Disclaimer {
+export type Disclaimer = {
   label?: string;
-}
+};
 
 // COMPONENTS
-export interface CallToAction extends Omit<HTMLAttributes<'a'>, 'slot'> {
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
-  text?: string;
+export type CallToAction = {
+  classes?: { [key: string]: string };
   icon?: string;
-  classes?: Record<string, string>;
-  type?: 'button' | 'submit' | 'reset';
-}
+  text?: string;
+  type?: 'button' | 'reset' | 'submit';
+  variant?: 'link' | 'primary' | 'secondary' | 'tertiary';
+} & Omit<HTMLAttributes<'a'>, 'slot'>;
 
-export interface ItemGrid {
-  items?: Array<Item>;
+export type ItemGrid = {
+  classes?: { [key: string]: string };
   columns?: number;
   defaultIcon?: string;
-  classes?: Record<string, string>;
-}
+  items?: Item[];
+};
 
-export interface Collapse {
-  iconUp?: string;
-  iconDown?: string;
-  items?: Array<Item>;
+export type Collapse = {
+  classes?: { [key: string]: string };
   columns?: number;
-  classes?: Record<string, string>;
-}
+  iconDown?: string;
+  iconUp?: string;
+  items?: Item[];
+};
 
-export interface Form {
-  inputs?: Array<Input>;
-  textarea?: Textarea;
-  disclaimer?: Disclaimer;
+export type Form = {
   button?: string;
   description?: string;
-}
+  disclaimer?: Disclaimer;
+  inputs?: Input[];
+  textarea?: Textarea;
+};
 
 // WIDGETS
-export interface Hero extends Omit<Headline, 'classes'>, Omit<Widget, 'isDark' | 'classes'> {
+export type Hero = {
+  actions?: CallToAction[] | string;
   content?: string;
-  actions?: string | CallToAction[];
-  image?: string | unknown;
-}
+  image?: unknown;
+} & Omit<Headline, 'classes'> &
+  Omit<Widget, 'classes' | 'isDark'>;
 
-export interface Team extends Omit<Headline, 'classes'>, Widget {
-  team?: Array<TeamMember>;
-}
+export type Team = {
+  team?: TeamMember[];
+} & Omit<Headline, 'classes'> &
+  Widget;
 
-export interface Stats extends Omit<Headline, 'classes'>, Widget {
-  stats?: Array<Stat>;
-}
+export type Stats = {
+  stats?: Stat[];
+} & Omit<Headline, 'classes'> &
+  Widget;
 
-export interface Pricing extends Omit<Headline, 'classes'>, Widget {
-  prices?: Array<Price>;
-}
+export type Pricing = {
+  prices?: Price[];
+} & Omit<Headline, 'classes'> &
+  Widget;
 
-export interface Testimonials extends Omit<Headline, 'classes'>, Widget {
-  testimonials?: Array<Testimonial>;
+export type Testimonials = {
   callToAction?: CallToAction;
-}
+  testimonials?: Testimonial[];
+} & Omit<Headline, 'classes'> &
+  Widget;
 
-export interface Brands extends Omit<Headline, 'classes'>, Widget {
-  icons?: Array<string>;
-  images?: Array<Image>;
-}
+export type Brands = {
+  icons?: string[];
+  images?: Image[];
+} & Omit<Headline, 'classes'> &
+  Widget;
 
-export interface Features extends Omit<Headline, 'classes'>, Widget {
-  image?: string | unknown;
-  video?: Video;
-  items?: Array<Item>;
-  columns?: number;
-  defaultIcon?: string;
+export type Features = {
   callToAction1?: CallToAction;
   callToAction2?: CallToAction;
-  isReversed?: boolean;
-  isBeforeContent?: boolean;
-  isAfterContent?: boolean;
-}
-
-export interface Faqs extends Omit<Headline, 'classes'>, Widget {
-  iconUp?: string;
-  iconDown?: string;
-  items?: Array<Item>;
   columns?: number;
-}
+  defaultIcon?: string;
+  image?: unknown;
+  isAfterContent?: boolean;
+  isBeforeContent?: boolean;
+  isReversed?: boolean;
+  items?: Item[];
+  video?: Video;
+} & Omit<Headline, 'classes'> &
+  Widget;
 
-export interface Steps extends Omit<Headline, 'classes'>, Widget {
-  items: Array<{
-    title: string;
+export type Faqs = {
+  columns?: number;
+  iconDown?: string;
+  iconUp?: string;
+  items?: Item[];
+} & Omit<Headline, 'classes'> &
+  Widget;
+
+export type Steps = {
+  callToAction?: CallToAction | string;
+  image?: Image | string;
+  isReversed?: boolean;
+  items: {
+    classes?: { [key: string]: string };
     description?: string;
     icon?: string;
-    classes?: Record<string, string>;
-  }>;
-  callToAction?: string | CallToAction;
-  image?: string | Image;
-  isReversed?: boolean;
-}
+    title: string;
+  }[];
+} & Omit<Headline, 'classes'> &
+  Widget;
 
-export interface Content extends Omit<Headline, 'classes'>, Widget {
-  content?: string;
-  image?: string | unknown;
-  items?: Array<Item>;
-  columns?: number;
-  isReversed?: boolean;
-  isAfterContent?: boolean;
+export type Content = {
   callToAction?: CallToAction;
-}
+  columns?: number;
+  content?: string;
+  image?: unknown;
+  isAfterContent?: boolean;
+  isReversed?: boolean;
+  items?: Item[];
+} & Omit<Headline, 'classes'> &
+  Widget;
 
-export interface Contact extends Omit<Headline, 'classes'>, Form, Widget {}
+export type Contact = {} & Form & Omit<Headline, 'classes'> & Widget;

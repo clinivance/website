@@ -1,9 +1,9 @@
-import { getImage } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
 import type { OpenGraph } from '@astrolib/seo';
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
 
 const load = async function () {
-  let images: Record<string, () => Promise<unknown>> | undefined = undefined;
+  let images: { [key: string]: () => Promise<unknown> } | undefined = undefined;
   try {
     images = import.meta.glob('~/assets/images/**/*.{jpeg,jpg,png,tiff,webp,gif,svg,JPEG,JPG,PNG,TIFF,WEBP,GIF,SVG}');
   } catch (e) {
@@ -12,7 +12,7 @@ const load = async function () {
   return images;
 };
 
-let _images: Record<string, () => Promise<unknown>> | undefined = undefined;
+let _images: { [key: string]: () => Promise<unknown> } | undefined = undefined;
 
 /** */
 export const fetchLocalImages = async () => {
@@ -22,8 +22,8 @@ export const fetchLocalImages = async () => {
 
 /** */
 export const findImage = async (
-  imagePath?: string | ImageMetadata | null
-): Promise<string | ImageMetadata | undefined | null> => {
+  imagePath?: ImageMetadata | null | string
+): Promise<ImageMetadata | null | string | undefined> => {
   // Not string
   if (typeof imagePath !== 'string') {
     return imagePath;
@@ -43,7 +43,7 @@ export const findImage = async (
   const key = imagePath.replace('~/', '/src/');
 
   return images && typeof images[key] === 'function'
-    ? ((await images[key]()) as { default: ImageMetadata })['default']
+    ? ((await images[key]()) as { default: ImageMetadata }).default
     : null;
 };
 
@@ -66,31 +66,31 @@ export const adaptOpenGraphImages = async (
         const resolvedImage = (await findImage(image.url)) as ImageMetadata | undefined;
         if (!resolvedImage) {
           return {
-            url: '',
+            url: ''
           };
         }
 
         const _image = await getImage({
-          src: resolvedImage,
           alt: 'Placeholder alt',
-          width: image?.width || defaultWidth,
           height: image?.height || defaultHeight,
+          src: resolvedImage,
+          width: image?.width || defaultWidth
         });
 
         if (typeof _image === 'object') {
           return {
-            url: 'src' in _image && typeof _image.src === 'string' ? String(new URL(_image.src, astroSite)) : 'pepe',
-            width: 'width' in _image && typeof _image.width === 'number' ? _image.width : undefined,
             height: 'height' in _image && typeof _image.height === 'number' ? _image.height : undefined,
+            url: 'src' in _image && typeof _image.src === 'string' ? String(new URL(_image.src, astroSite)) : 'pepe',
+            width: 'width' in _image && typeof _image.width === 'number' ? _image.width : undefined
           };
         }
         return {
-          url: '',
+          url: ''
         };
       }
 
       return {
-        url: '',
+        url: ''
       };
     })
   );

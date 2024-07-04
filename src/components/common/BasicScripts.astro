@@ -18,7 +18,7 @@ import { UI } from 'astrowind:config';
   }
 
   const initTheme = function () {
-    if ((defaultTheme && defaultTheme.endsWith(':only')) || (!localStorage.theme && defaultTheme !== 'system')) {
+    if (defaultTheme?.endsWith(':only') || (!localStorage.theme && defaultTheme !== 'system')) {
       applyTheme(defaultTheme.replace(':only', ''));
     } else if (
       localStorage.theme === 'dark' ||
@@ -33,7 +33,7 @@ import { UI } from 'astrowind:config';
 
   function attachEvent(selector, event, fn) {
     const matches = typeof selector === 'string' ? document.querySelectorAll(selector) : selector;
-    if (matches && matches.length) {
+    if (matches?.length) {
       matches.forEach((elem) => {
         elem.addEventListener(event, (e) => fn(e, elem), false);
       });
