@@ -1,7 +1,7 @@
 import { getAsset, getBlogPermalink, getPermalink } from './utils/permalinks';
 
 export const headerData = {
-  actions: [{ href: 'https://github.com/onwidget/astrowind', target: '_blank', text: 'Download' }],
+  actions: [{ href: 'https://github.com/clinivance', target: '_blank', text: 'GitHub' }],
   links: [
     {
       links: [
